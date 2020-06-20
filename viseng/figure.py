@@ -3,6 +3,7 @@ import matplotlib.projections as proj
 from matplotlib.animation import FuncAnimation, writers
 from matplotlib import pyplot as plt
 from tqdm import tqdm
+import subprocess
 
 import math
 import numpy as np
@@ -186,7 +187,7 @@ class FuncFig(plt.Figure):
 		def anim(i):
 			[f(i) for f in funcs]
 
-		self.anim = FuncAnimation(fig=self, func=anim, frames=self.n_frames, interval = 1000//self.fps) # attribute func animation to permanent object
+		self.anim_func = anim
 
 	def save(self, *args, **kwargs):
 
@@ -196,7 +197,7 @@ class FuncFig(plt.Figure):
 		else:
 			super().savefig(*args, **kwargs)
 
-	def saveanim(self, title="unnamed", fmt="mp4", out_dir = "outputs"):
+	def saveanim(self, title="unnamed", fmt="mp4", out_dir = "outputs", transparent=False):
 
 		# writer = writers["xxx"]
 		if fmt == "gif":
@@ -212,13 +213,30 @@ class FuncFig(plt.Figure):
 
 		w = writer(fps = self.fps, bitrate = 1500)
 
-		dir_path = os.path.dirname(os.path.realpath(__file__)) # directory of viseng
+		try_mkdir(out_dir)
+		tmp_dir = os.path.join(out_dir, "tmp")
+		try_mkdir(tmp_dir)
 
-		try_mkdir(os.path.join(dir_path, out_dir))
+		## Write all images, and then use writer to join together
+		with tqdm(np.arange(self.n_frames)) as tqdm_iterator:
+			for i in tqdm_iterator:
+				self.anim_func(i)
+				self.savefig(os.path.join(tmp_dir, f"{i:05d}.png"), dpi=dpi, transparent=transparent)
 
-		with tqdm(total = self.n_frames) as save_progress:
-			self.anim.save(os.path.join(dir_path, out_dir, f"{title}.{fmt}"), writer=w,
-						   progress_callback = lambda x,i: save_progress.update())
+		args = []
+
+		if fmt == "gif":
+			delay = 100 / self.fps  # delay measured in hundredths of a second between frames
+			args += ["magick", "convert", "-delay", str(delay), "-loop", "0"]
+			if transparent: args += ["-dispose", "Background"]
+			args += [f"{tmp_dir}\*.png", os.path.join(out_dir, f"{title}.{fmt}")]
+
+		elif fmt == "mp4":
+			args = ["ffmpeg", "-i", f"{tmp_dir}\%05d.png", "-lavfi", "paletteuse=alpha_threshold=128", "-gifflags",
+					"-offsetting",
+					os.path.join(out_dir, f"{title}.{fmt}")]
+
+		subprocess.call(args, shell=True)
 
 	def extend(self, left=0, right=1, bottom=0, top=1):
 		"""Extend subplot. By default, full size"""

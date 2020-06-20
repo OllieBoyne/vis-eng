@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
 	name='viseng',
-	version='0.1',
+	version='0.1.1',
 	packages=['viseng'],
 	url='https://github.com/OllieBoyne/viseng',
 	license='',
