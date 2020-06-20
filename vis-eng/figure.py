@@ -1,9 +1,7 @@
 import matplotlib.projections as proj
-from itertools import zip_longest
 
 from matplotlib.animation import FuncAnimation, writers
 from matplotlib import pyplot as plt
-from time import perf_counter
 from tqdm import tqdm
 
 import os, math
@@ -216,6 +214,7 @@ class FuncFig(plt.Figure):
 
 		dir_path = os.path.dirname(os.path.realpath(__file__)) # directory of vis-eng
 
+		try_mkdir(os.path.join(dir_path, out_dir))
 
 		with tqdm(total = self.n_frames) as save_progress:
 			self.anim.save(os.path.join(dir_path, out_dir, f"{title}.{fmt}"), writer=w,
