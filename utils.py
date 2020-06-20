@@ -1,0 +1,1 @@
+np_minmax = lambda x: [x.min(), x.max()]
