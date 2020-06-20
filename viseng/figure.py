@@ -4,12 +4,12 @@ from matplotlib.animation import FuncAnimation, writers
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
-import os, math
+import math
 import numpy as np
-from utils import *
-from function import Function, AnimatedFunction, FillBetween, AnimatedFunctional
-from annotations import TextBox
-from patches import AnimatedPatch
+from viseng.utils import *
+from viseng.function import Function, AnimatedFunction, FillBetween, AnimatedFunctional
+from viseng.annotations import TextBox
+from viseng.patches import AnimatedPatch
 
 def load_writer(writer_name, message=""):
 
@@ -212,7 +212,7 @@ class FuncFig(plt.Figure):
 
 		w = writer(fps = self.fps, bitrate = 1500)
 
-		dir_path = os.path.dirname(os.path.realpath(__file__)) # directory of vis-eng
+		dir_path = os.path.dirname(os.path.realpath(__file__)) # directory of viseng
 
 		try_mkdir(os.path.join(dir_path, out_dir))
 

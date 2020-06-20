@@ -5,9 +5,9 @@ with open("README.md", "r") as fh:
 
 
 setuptools.setup(
-    name = "vis-eng",
+    name = "viseng",
     version="0.1",
-    scripts=["vis-eng"],
+    scripts=["viseng"],
     author="Ollie Boyne",
     author_email="ollieboyne@gmail.com",
     description="Pyplot visualisation package",
